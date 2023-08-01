@@ -57,6 +57,7 @@
                 </el-tag>
                 <el-tag
                   v-if="selected.length > maxCollapseTags"
+                  ref="extraTagRef"
                   :closable="false"
                   :size="collapseTagSize"
                   :type="tagType"
@@ -461,6 +462,7 @@ export default defineComponent({
       iOSInput,
       tooltipRef,
       tagTooltipRef,
+      extraTagRef,
       tags,
       selectWrapper,
       scrollbar,
@@ -679,6 +681,7 @@ export default defineComponent({
       showTagList,
       collapseTagList,
       tagTooltipRef,
+      extraTagRef,
     }
   },
 })

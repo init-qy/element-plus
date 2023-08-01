@@ -33,6 +33,7 @@ import { useFormItem, useFormSize } from '@element-plus/components/form'
 
 import type { CSSProperties, ComponentPublicInstance } from 'vue'
 import type ElTooltip from '@element-plus/components/tooltip'
+import type ELTag from '@element-plus/components/tag'
 import type { QueryChangeCtx, SelectOptionProxy } from './token'
 
 export function useSelectStates(props) {
@@ -90,6 +91,7 @@ export const useSelect = (props, states: States, ctx) => {
   const iOSInput = ref<HTMLInputElement | null>(null)
   const tooltipRef = ref<InstanceType<typeof ElTooltip> | null>(null)
   const tagTooltipRef = ref<InstanceType<typeof ElTooltip> | null>(null)
+  const extraTagRef = ref<InstanceType<typeof ELTag> | null>(null)
   const tags = ref<HTMLElement | null>(null)
   const selectWrapper = ref<HTMLElement | null>(null)
   const scrollbar = ref<{
@@ -951,7 +953,18 @@ export const useSelect = (props, states: States, ctx) => {
   })
 
   const tagTextStyle = computed(() => {
-    return { maxWidth: `calc(${selectTagsStyle.value.maxWidth} - 36px)` }
+    const extraTagWidth =
+      props.collapseTags && props.maxCollapseTags === 1
+        ? extraTagRef?.value?.$el.offsetWidth || 36 // this 36 mean a (+ 1)tag width, 9(padding) * 2 + 1(border) * 2 + 16(text width)
+        : 0
+
+    return {
+      maxWidth: `${
+        Number.parseInt(selectTagsStyle.value.maxWidth) -
+        36 - // this 36 mean tag with closeIcon outer width, 1(border) * 2 + 9(p-l) + 5(p-r) + 20(closeIcon width)
+        (extraTagWidth + 8) // this 8 mean tag with closeIcon margin 6 + 2px extra(text width maybe 16.08)
+      }px`,
+    } as CSSProperties
   })
 
   const inputStyle = computed(() => ({
@@ -1016,6 +1029,7 @@ export const useSelect = (props, states: States, ctx) => {
     iOSInput,
     tooltipRef,
     tagTooltipRef,
+    extraTagRef,
     tags,
     selectWrapper,
     scrollbar,
