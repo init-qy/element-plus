@@ -40,7 +40,7 @@
               v-if="collapseTags && selected.length"
               @after-leave="resetInputHeight"
             >
-              <span :class="tagWrapperKls">
+              <span>
                 <el-tag
                   v-for="item in showTagList"
                   :key="getValueKey(item)"
@@ -95,9 +95,7 @@
                           >
                             <span
                               :class="nsSelect.e('tags-text')"
-                              :style="{
-                                maxWidth: inputWidth - 75 + 'px',
-                              }"
+                              :style="tagTextStyle"
                               >{{ item.currentLabel }}</span
                             >
                           </el-tag>
@@ -112,14 +110,7 @@
               </span>
             </transition>
             <transition v-if="!collapseTags" @after-leave="resetInputHeight">
-              <span
-                :class="tagWrapperKls"
-                :style="
-                  prefixWidth && selected.length
-                    ? { marginLeft: `${prefixWidth}px` }
-                    : ''
-                "
-              >
+              <span>
                 <el-tag
                   v-for="item in selected"
                   :key="getValueKey(item)"
@@ -132,7 +123,7 @@
                 >
                   <span
                     :class="nsSelect.e('tags-text')"
-                    :style="{ maxWidth: inputWidth - 75 + 'px' }"
+                    :style="tagTextStyle"
                     >{{ item.currentLabel }}</span
                   >
                 </el-tag>
@@ -203,16 +194,7 @@
             @keydown.tab="visible = false"
           >
             <template v-if="$slots.prefix" #prefix>
-              <div
-                style="
-                  height: 100%;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
-                "
-              >
-                <slot name="prefix" />
-              </div>
+              <slot name="prefix" />
             </template>
             <template #suffix>
               <el-icon
@@ -490,6 +472,8 @@ export default defineComponent({
       collapseTagList,
       // computed style
       selectTagsStyle,
+      tagTextStyle,
+      inputStyle,
     } = useSelect(props, states, ctx)
 
     const { focus } = useFocus(reference)
@@ -530,11 +514,6 @@ export default defineComponent({
       nsSelect.is('disabled', unref(selectDisabled)),
     ])
 
-    const tagWrapperKls = computed(() => [
-      nsSelect.b('tags-wrapper'),
-      { 'has-prefix': unref(prefixWidth) && unref(selected).length },
-    ])
-
     const inputKls = computed(() => [
       nsSelect.e('input'),
       nsSelect.is(unref(selectSize)),
@@ -555,21 +534,6 @@ export default defineComponent({
           unref(filteredOptionsCount) === 0
       ),
     ])
-
-    const tagTextStyle = computed(() => {
-      const maxWidth =
-        unref(inputWidth) > 123
-          ? unref(inputWidth) - 123
-          : unref(inputWidth) - 75
-      return { maxWidth: `${maxWidth}px` }
-    })
-
-    const inputStyle = computed(() => ({
-      marginLeft: `${unref(prefixWidth)}px`,
-      flexGrow: 1,
-      width: `${unref(inputLength) / (unref(inputWidth) - 32)}%`,
-      maxWidth: `${unref(inputWidth) - 42}px`,
-    }))
 
     provide(
       selectKey,
@@ -702,7 +666,7 @@ export default defineComponent({
 
       wrapperKls,
       tagsKls,
-      tagWrapperKls,
+      // tagWrapperKls,
       inputKls,
       iOSInputKls,
       scrollbarKls,

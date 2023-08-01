@@ -31,7 +31,7 @@ import {
 import { useDeprecated, useLocale, useNamespace } from '@element-plus/hooks'
 import { useFormItem, useFormSize } from '@element-plus/components/form'
 
-import type { ComponentPublicInstance } from 'vue'
+import type { CSSProperties, ComponentPublicInstance } from 'vue'
 import type ElTooltip from '@element-plus/components/tooltip'
 import type { QueryChangeCtx, SelectOptionProxy } from './token'
 
@@ -934,12 +934,31 @@ export const useSelect = (props, states: States, ctx) => {
 
   // computed style
   // if in form and use statusIcon, the width of the icon needs to be subtracted, fix #13526
-  const selectTagsStyle = computed(() => ({
-    maxWidth: `${
-      unref(states.inputWidth) - 32 - (showStatusIconAndState.value ? 22 : 0)
-    }px`,
-    width: '100%',
+  const selectTagsStyle = computed(() => {
+    const suffixWidth = 32
+    const inputWrapperPaddingLeft = 11
+    const statusIconWidth = showStatusIconAndState.value ? 22 : 0
+    const marginLeft = ctx.slots.prefix
+      ? unref(states.prefixWidth) - 6
+      : inputWrapperPaddingLeft
+    return {
+      marginLeft: `${marginLeft}px`,
+      width: '100%',
+      maxWidth: `${
+        unref(states.inputWidth) - marginLeft - suffixWidth - statusIconWidth
+      }px`,
+    } as CSSProperties
+  })
+
+  const tagTextStyle = computed(() => {
+    return { maxWidth: `calc(${selectTagsStyle.value.maxWidth} - 36px)` }
+  })
+
+  const inputStyle = computed(() => ({
+    width: `${unref(states.inputLength) / (unref(states.inputWidth) - 32)}%`,
+    maxWidth: `${unref(states.inputWidth) - 42}px`,
   }))
+
   return {
     optionList,
     optionsArray,
@@ -988,6 +1007,8 @@ export const useSelect = (props, states: States, ctx) => {
 
     // computed style
     selectTagsStyle,
+    tagTextStyle,
+    inputStyle,
 
     // DOM ref
     reference,
